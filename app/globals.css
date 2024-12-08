@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(202, 202, 202, 0) transparent;
+}
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.debug {
+  outline: 1px solid red;
+}
+
+button {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid transparent;
+}
+
+ul {
+  list-style: none;
+}
+li {
+  list-style: none;
+}
