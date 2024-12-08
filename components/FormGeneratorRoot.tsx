@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Reorder } from "motion/react";
 import InlineEditableField from "./InlineEditableHeader";
 import TopRightArrow from "./icons/TopRightArrow";
@@ -16,6 +16,9 @@ import Draft from "./icons/Draft";
 import Tick from "./icons/Tick";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Drawer } from "vaul";
+import FormList from "./FormList";
+import Menu from "./icons/Menu";
 
 const FORM_INDEX_KEY = "formIndex";
 interface FormGeneratorRootProps {
@@ -24,7 +27,6 @@ interface FormGeneratorRootProps {
 
 const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
   const router = useRouter();
-
   const [formData, setFormData] = useState<FormDataProps>({
     title: "Untitled Form",
     question: [],
@@ -32,8 +34,8 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
     createdAt: Date.now().toString(),
     status: FormStatus.DRAFT,
   });
-
   const [questions, setQuestions] = useState<Question[]>([]);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (selectedFormUid) {
@@ -71,8 +73,14 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
       helpText: "Write a help text or caption (leave empty if not needed).",
       options: ["Option 1"],
       value: "",
+      required: false,
     };
     setQuestions((prev) => [...prev, newQuestion]);
+    ref.current?.scrollIntoView();
+  };
+
+  const removeQuestion = (id: string) => {
+    setQuestions((prev) => prev.filter((q) => q.id !== id));
   };
 
   const updateQuestion = (id: string, updatedQuestion: Question) => {
@@ -121,12 +129,16 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
 
   return (
     <div className="min-h-screen w-full relative">
-      <div className="px-6 py-4 flex items-center justify-between gap-4 border-b-[1px] border-gray-200 sticky top-0 bg-white z-10">
-        <InlineEditableField
-          initialText={formData.title}
-          onSave={handleFormTitleUpdate}
-          style="font-semibold"
-        />
+      <div className="px-6 py-4 flex items-center justify-between gap-4 border-b-[1px] border-gray-200 sticky top-0 bg-white z-[2]">
+        <div className="flex items-center gap-2 w-full">
+          <T />
+          <InlineEditableField
+            initialText={formData.title}
+            onSave={handleFormTitleUpdate}
+            style="font-semibold"
+          />
+        </div>
+
         <button
           className="text-gray-400 font-semibold border-gray-200"
           onClick={handlePreview}
@@ -135,8 +147,9 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
           <TopRightArrow />
         </button>
       </div>
+
       <div
-        className="p-6 space-y-4 debug overflow-scroll"
+        className="p-6 space-y-4 overflow-scroll"
         style={{ minHeight: "calc(100vh - 100px)" }}
       >
         <Reorder.Group
@@ -152,10 +165,14 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
               key={question.id}
               question={question}
               updateQuestion={updateQuestion}
+              removeQuestion={removeQuestion}
             />
           ))}
         </Reorder.Group>
-        <div className="flex flex-col items-center gap-4 p-6">
+        <div
+          className="flex flex-col items-center gap-4 p-6 pb-[190px]"
+          ref={ref}
+        >
           <AddQuestionButton addQuestion={addQuestion} />
         </div>
       </div>
@@ -176,6 +193,35 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
           Publish form
         </button>
       </div>
+    </div>
+  );
+};
+
+const T = () => {
+  return (
+    <div className="t">
+      <Drawer.Root direction="left">
+        <Drawer.Trigger className="" asChild>
+          <button className="p-0 rounded-sm text-gray-500">
+            <Menu />
+          </button>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[5]" />
+          <Drawer.Content
+            className="left-2 top-2 bottom-2 fixed z-10 outline-none w-[310px] flex"
+            style={
+              {
+                "--initial-transform": "calc(100% + 8px)",
+              } as React.CSSProperties
+            }
+          >
+            <div className="bg-white h-full w-full grow p-4 flex flex-col rounded-[16px]">
+              <FormList />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
     </div>
   );
 };

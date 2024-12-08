@@ -13,6 +13,7 @@ export interface Question {
   helpText: string;
   options?: string[];
   value?: string;
+  required: boolean;
 }
 
 export enum FormStatus {
