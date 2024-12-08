@@ -56,8 +56,7 @@ const FormList = () => {
   );
 };
 
-const FormItem = ({ form }: any) => {
-  console.log(form);
+const FormItem = ({ form }: { form: FormDataProps }) => {
   return (
     <li className="w-full rounded-md overflow-hidden">
       <div className="w-full bg-gray-50 p-2">

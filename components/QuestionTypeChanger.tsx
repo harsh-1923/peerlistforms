@@ -3,11 +3,17 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ChevronDown from "./icons/ChevronDown";
 import { getQuestionTypeIcon } from "@/utils/FormGeneratorUtils";
 
-const getFormattedString = (type: any) => {
+const getFormattedString = (type: QuestionType) => {
   return type.split("_").join(" ");
 };
 
-const QuestionTypeChanger = ({ questionType, onUpdate }: any) => {
+const QuestionTypeChanger = ({
+  questionType,
+  onUpdate,
+}: {
+  questionType: QuestionType;
+  onUpdate: (newQuestionType: QuestionType) => void;
+}) => {
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>

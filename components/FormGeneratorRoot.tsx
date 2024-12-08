@@ -87,7 +87,7 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
     const { uid } = updatedFormData;
 
     const indexStr = localStorage.getItem(FORM_INDEX_KEY);
-    let formUids: string[] = indexStr ? JSON.parse(indexStr) : [];
+    const formUids: string[] = indexStr ? JSON.parse(indexStr) : [];
 
     if (!formUids.includes(uid)) {
       formUids.push(uid);
