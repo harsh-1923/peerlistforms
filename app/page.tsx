@@ -1,9 +1,5 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import FormGeneratorRoot from "@/components/FormGeneratorRoot";
-import { FormDataProps } from "@/types/FormTypes";
-import Link from "next/link";
 import Image from "next/image";
 import FormList from "@/components/FormList";
 
