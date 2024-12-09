@@ -4,7 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import FormNotFound from "./FormNotFound";
 import { useAppContext } from "@/context/AppContext";
-import { FileSpreadsheet, Eye, FileEdit, Share2, Trash2 } from "lucide-react";
+import {
+  FileSpreadsheet,
+  Eye,
+  FileEdit,
+  Share2,
+  Trash2,
+  Search,
+} from "lucide-react"; // Added Search icon
 import { toast } from "sonner";
 
 interface ExtendedFormDataProps extends FormDataProps {
@@ -13,6 +20,7 @@ interface ExtendedFormDataProps extends FormDataProps {
 
 const FormList = () => {
   const [forms, setForms] = useState<ExtendedFormDataProps[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Added search term state
   const { savedForms, setSavedForms } = useAppContext();
 
   useEffect(() => {
@@ -83,21 +91,40 @@ const FormList = () => {
     );
   };
 
+  // Filter forms based on search term
+  const filteredForms = forms.filter((form) =>
+    form.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div>
-      <h2 className="text-xl font-medium mb-4">Created Forms</h2>
-      {forms.length === 0 ? (
-        <FormNotFound />
-      ) : (
-        <ul className="space-y-4">
-          {forms.map((form) => (
-            <li key={form.uid}>
-              <FormItem form={form} onDelete={handleDelete} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <>
+      <div className="h-[var(--top-bar-height)] border-gray-200 border-b-[1px] flex items-center justify-between px-4">
+        <div className="relative max-w-md w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <input
+            type="search"
+            placeholder="Search Peerlist"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-gray-100 text-gray-800 placeholder-gray-500 rounded-full"
+          />
+        </div>
+      </div>
+      <div className="p-4">
+        <h2 className="text-xl font-medium mb-6">Created Forms</h2>
+        {filteredForms.length === 0 ? (
+          <FormNotFound />
+        ) : (
+          <ul className="space-y-4">
+            {filteredForms.map((form) => (
+              <li key={form.uid}>
+                <FormItem form={form} onDelete={handleDelete} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </>
   );
 };
 
@@ -109,14 +136,22 @@ const FormItem = ({
   onDelete: (uid: string) => void;
 }) => {
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-md shadow-sm">
+    <div className="w-full bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
       <div className="p-3 space-y-2">
         <div className="flex justify-between h-6 items-center">
           <h3 className="text-sm font-normal truncate">{form.title}</h3>
           <button
             className="h-6 hover:bg-gray-50 p-2 rounded-full"
-            onClick={() => {
-              // Handle share if needed
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(
+                  `https://peerlistforms.vercel.app/preview/${form.uid}`
+                );
+                toast.success("Link to form copied");
+              } catch (e) {
+                e?.toString();
+                toast.error("Could not copy link to form");
+              }
             }}
           >
             <Share2
@@ -148,24 +183,24 @@ const FormItem = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-3 text-xs">
+      <div className="grid grid-cols-3 text-xs p-1">
         <Link
           href={`/response/${form.uid}`}
-          className="p-2 flex flex-col items-center justify-center text-gray-600 hover:bg-gray-50 rounded-sm"
+          className="p-2 flex flex-col items-center justify-center text-gray-600 hover:bg-gray-50 rounded-md"
         >
           <FileSpreadsheet className="h-4 w-4" />
           <span className="text-xs mt-1">Responses</span>
         </Link>
         <Link
           href={`/preview/${form.uid}`}
-          className="p-2 flex flex-col items-center justify-center text-gray-600 hover:bg-gray-50 rounded-sm"
+          className="p-2 flex flex-col items-center justify-center text-gray-600 hover:bg-gray-50 rounded-md"
         >
           <Eye className="h-4 w-4" />
           <span className="text-xs mt-1">Preview</span>
         </Link>
         <Link
           href={`/editor/${form.uid}`}
-          className="p-2 flex flex-col items-center justify-center text-gray-600 hover:bg-gray-50 rounded-sm"
+          className="p-2 flex flex-col items-center justify-center text-gray-600 hover:bg-gray-50 rounded-md"
         >
           <FileEdit className="h-4 w-4" />
           <span className="text-xs mt-1">Edit</span>

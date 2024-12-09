@@ -121,8 +121,41 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
     });
   };
 
+  // Validation function to check if the form has been updated
+  const validateForm = (): boolean => {
+    // Check if the title is still the default
+    if (formData.title.trim() === "Untitled Form") {
+      toast.error("Please update the form title before saving.");
+      return false;
+    }
+
+    // Check if there are no questions
+    if (questions.length === 0) {
+      toast.error("Please add at least one question before saving.");
+      return false;
+    }
+
+    // Check if any question has the default title
+    const hasDefaultQuestionTitle = questions.some(
+      (q) => q.title.trim() === "Write a question"
+    );
+    if (hasDefaultQuestionTitle) {
+      toast.error("Please update all question titles before saving.");
+      return false;
+    }
+
+    // All validations passed
+    return true;
+  };
+
   const saveForm = (status: FormStatus) => {
     if (!currentFormUID) return;
+
+    // Perform validation before saving
+    if (!validateForm()) {
+      return; // Stop the save operation if validation fails
+    }
+
     const cleanedQuestions = cleanupQuestions(formData.question);
     const updatedFormData = {
       ...formData,
@@ -166,6 +199,12 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
 
   const handlePreview = () => {
     if (!currentFormUID) return;
+
+    // Perform validation before previewing
+    if (!validateForm()) {
+      return; // Stop the preview operation if validation fails
+    }
+
     const currentStatus = formData.status;
     const statusToSave =
       currentStatus === FormStatus.PUBLISHED
@@ -176,6 +215,11 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
   };
 
   const handlePublish = () => {
+    // Perform validation before publishing
+    if (!validateForm()) {
+      return; // Stop the publish operation if validation fails
+    }
+
     saveForm(FormStatus.PUBLISHED);
   };
 
@@ -229,14 +273,14 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
       <footer className="sticky bottom-0 z-[2] bg-gray-100 border-t p-6 border-gray-200 h-[var(--bottom-bar-height)] flex items-center justify-between gap-2">
         <button
           onClick={() => saveForm(FormStatus.DRAFT)}
-          className="bg-white text-sm font-medium gap-1"
+          className="bg-white text-sm font-medium gap-1 flex items-center"
         >
           <Draft />
           Save as draft
         </button>
         <button
           onClick={handlePublish}
-          className="bg-[#00AA45] text-white text-sm font-semibold gap-1"
+          className="bg-[#00AA45] text-white text-sm font-semibold gap-1 flex items-center"
         >
           <Tick />
           Publish form

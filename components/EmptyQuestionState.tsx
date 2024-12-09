@@ -4,9 +4,9 @@ import { motion } from "motion/react";
 const EmptyQuestionState = () => {
   return (
     <motion.div
-      initial={{ y: 10, opacity: 0, filter: "blur(8px)" }}
+      initial={{ y: 10, opacity: 0, filter: "blur(4px)" }}
       animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-      exit={{ y: 10, opacity: 0, filter: "blur(8px)" }}
+      exit={{ y: 10, opacity: 0, filter: "blur(4px)" }}
       transition={{ duration: 0.3 }}
       className="outline-gray-100 outline-[1px] outline w-full p-6 rounded-lg bg-white relative overflow-hidden"
     >
@@ -18,7 +18,7 @@ const EmptyQuestionState = () => {
         <p className="font-medium text-sm font-serif italic text-brand">
           No questions added yet
         </p>
-        <p className="font-medium text-xs font-serif italic text-gray-500">
+        <p className="font-medium text-xs font-instrument italic text-gray-500">
           Create a form and share with the world
         </p>
       </div>

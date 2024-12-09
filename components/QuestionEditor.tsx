@@ -53,7 +53,7 @@ const QuestionEditor = ({
       drag="y"
       dragListener={false}
       dragControls={dragControls}
-      className="w-full border-[1px] border-gray-200 rounded-2xl p-4 space-y-2 bg-white"
+      className="w-full border-[1px] border-gray-200 rounded-2xl p-4 space-y-2 bg-white select-none"
       layout
       transition={{ type: "spring", bounce: 0, duration: 0.5 }}
       initial={{ y: 10, opacity: 0 }}

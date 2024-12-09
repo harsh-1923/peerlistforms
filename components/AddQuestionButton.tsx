@@ -8,6 +8,7 @@ import LongAnswer from "./icons/LongAnswer";
 import SingleSelect from "./icons/SingleSelect";
 import URL from "./icons/URL";
 import Date from "./icons/Date";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
 const AddQuestionButton = ({
   addQuestion,
@@ -16,9 +17,14 @@ const AddQuestionButton = ({
 }) => {
   const [expanded, setIsExpanded] = useState<boolean>(false);
   const [boundsRef, bounds] = useMeasure();
+
+  // Use the custom hook to close the menu when clicking outside
+  const containerRef = useClickOutside(() => setIsExpanded(false));
+
   return (
     <MotionConfig transition={{ type: "spring", bounce: 0.1, duration: 0.4 }}>
       <motion.div
+        ref={containerRef}
         animate={{ width: bounds.width, height: bounds.height }}
         className="overflow-hidden border-gray-200 border-[1px] rounded-2xl bg-white"
       >
@@ -27,11 +33,7 @@ const AddQuestionButton = ({
             <Plus /> <p className="inline-block pr-2">Question</p>
           </button>
         ) : (
-          <div
-            ref={boundsRef}
-            onClick={() => setIsExpanded(!expanded)}
-            className="w-[300px] p-1 flex flex-col"
-          >
+          <div ref={boundsRef} className="w-[300px] p-1 flex flex-col">
             <div className="h-9 py-2 px-4 flex items-center bg-gray-50 p-1 rounded-lg font-mono">
               <p className="text-xs text-gray-500 font-semibold tracking-wide">
                 INPUT TYPES
@@ -39,35 +41,50 @@ const AddQuestionButton = ({
             </div>
             <button
               className="w-full justify-start hover:bg-gray-50 "
-              onClick={() => addQuestion(QuestionType.ShortAnswer)}
+              onClick={() => {
+                setIsExpanded(!expanded);
+                addQuestion(QuestionType.ShortAnswer);
+              }}
             >
               <ShortAnswer />
               Short Answer
             </button>
             <button
               className="w-full justify-start hover:bg-gray-50"
-              onClick={() => addQuestion(QuestionType.LongAnswer)}
+              onClick={() => {
+                setIsExpanded(!expanded);
+                addQuestion(QuestionType.LongAnswer);
+              }}
             >
               <LongAnswer />
               Long Answer
             </button>
             <button
               className="w-full justify-start hover:bg-gray-50"
-              onClick={() => addQuestion(QuestionType.SingleSelect)}
+              onClick={() => {
+                setIsExpanded(!expanded);
+                addQuestion(QuestionType.SingleSelect);
+              }}
             >
               <SingleSelect />
               Single Select
             </button>
             <button
               className="w-full justify-start hover:bg-gray-50"
-              onClick={() => addQuestion(QuestionType.URL)}
+              onClick={() => {
+                setIsExpanded(!expanded);
+                addQuestion(QuestionType.URL);
+              }}
             >
               <URL />
               URL
             </button>
             <button
               className="w-full justify-start hover:bg-gray-50"
-              onClick={() => addQuestion(QuestionType.DATE)}
+              onClick={() => {
+                setIsExpanded(!expanded);
+                addQuestion(QuestionType.DATE);
+              }}
             >
               <Date />
               Date
