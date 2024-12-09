@@ -18,13 +18,7 @@
   --sh-entity: #e0af68;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-:focus {
+input:focus {
   outline: 2px solid #00aa45;
 }
 

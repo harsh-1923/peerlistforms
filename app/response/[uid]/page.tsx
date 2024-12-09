@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { FormDataProps } from "@/types/FormTypes"; // Adjust this import based on your project structure
+import { FormDataProps } from "@/types/FormTypes";
 
 interface ResponseEntry {
   createdAt: number;

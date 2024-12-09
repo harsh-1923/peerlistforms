@@ -21,11 +21,14 @@ import FormList from "./FormList";
 import Menu from "./icons/Menu";
 
 const FORM_INDEX_KEY = "formIndex";
+const DEFAULT_HELP_TEXT =
+  "Write a help text or caption (leave empty if not needed).";
+
 interface FormGeneratorRootProps {
-  selectedFormUid?: string | null;
+  uid?: string;
 }
 
-const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
+const FormGeneratorRoot = ({ uid }: FormGeneratorRootProps) => {
   const router = useRouter();
   const [formData, setFormData] = useState<FormDataProps>({
     title: "Untitled Form",
@@ -38,24 +41,38 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (selectedFormUid) {
-      const savedFormData = localStorage.getItem(`formData_${selectedFormUid}`);
+    if (uid) {
+      // If a uid is provided, try to load the form data from local storage
+      const savedFormData = localStorage.getItem(`formData_${uid}`);
       if (savedFormData) {
         const parsedData = JSON.parse(savedFormData) as FormDataProps;
         setFormData(parsedData);
         setQuestions(parsedData.question || []);
+      } else {
+        // If no data found for the given uid, create a new form with that uid
+        const newFormData: FormDataProps = {
+          title: "Untitled Form",
+          question: [],
+          uid,
+          createdAt: Date.now().toString(),
+          status: FormStatus.DRAFT,
+        };
+        setFormData(newFormData);
+        setQuestions([]);
       }
     } else {
-      setFormData({
+      const newUid = uuidv4();
+      const newFormData: FormDataProps = {
         title: "Untitled Form",
         question: [],
-        uid: uuidv4(),
+        uid: newUid,
         createdAt: Date.now().toString(),
         status: FormStatus.DRAFT,
-      });
+      };
+      setFormData(newFormData);
       setQuestions([]);
     }
-  }, [selectedFormUid]);
+  }, [uid]);
 
   const handleFormTitleUpdate = (newText: string) => {
     setFormData((prev) => ({ ...prev, title: newText }));
@@ -70,7 +87,7 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
       id: uuidv4(),
       type,
       title: "Write a question",
-      helpText: "Write a help text or caption (leave empty if not needed).",
+      helpText: DEFAULT_HELP_TEXT,
       options: ["Option 1"],
       value: "",
       required: false,
@@ -89,9 +106,18 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
     );
   };
 
+  const cleanupQuestions = (questions: Question[]): Question[] => {
+    return questions.map((q) => {
+      if (q.helpText === DEFAULT_HELP_TEXT) {
+        return { ...q, helpText: "" };
+      }
+      return q;
+    });
+  };
+
   const saveForm = (status: FormStatus) => {
-    // Update the form status before saving
-    const updatedFormData = { ...formData, status };
+    const cleanedQuestions = cleanupQuestions(formData.question);
+    const updatedFormData = { ...formData, question: cleanedQuestions, status };
     const { uid } = updatedFormData;
 
     const indexStr = localStorage.getItem(FORM_INDEX_KEY);
@@ -104,6 +130,7 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
     localStorage.setItem(FORM_INDEX_KEY, JSON.stringify(formUids));
     localStorage.setItem(`formData_${uid}`, JSON.stringify(updatedFormData));
     setFormData(updatedFormData);
+    setQuestions(cleanedQuestions);
     generateToast(updatedFormData.status);
   };
 
@@ -119,7 +146,12 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
   };
 
   const handlePreview = () => {
-    saveForm(FormStatus.DRAFT);
+    const currentStatus = formData.status;
+    const statusToSave =
+      currentStatus === FormStatus.PUBLISHED
+        ? FormStatus.PUBLISHED
+        : FormStatus.DRAFT;
+    saveForm(statusToSave);
     router.push(`/preview/${formData.uid}`);
   };
 
@@ -150,7 +182,7 @@ const FormGeneratorRoot = ({ selectedFormUid }: FormGeneratorRootProps) => {
 
       <div
         className="p-6 space-y-4 overflow-scroll"
-        style={{ minHeight: "calc(100vh - 100px)" }}
+        style={{ minHeight: "calc(100dvh - 100px)" }}
       >
         <Reorder.Group
           as="div"
