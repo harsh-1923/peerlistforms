@@ -21,7 +21,7 @@ import { motion } from "motion/react";
 import IslandTrigger from "./IslandTrigger";
 
 const FORM_INDEX_KEY = "formIndex";
-const DEFAULT_HELP_TEXT =
+export const DEFAULT_HELP_TEXT =
   "Write a help text or caption (leave empty if not needed).";
 
 interface FormGeneratorRootProps {
@@ -39,34 +39,32 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
     createdAt: Date.now().toString(),
     status: FormStatus.DRAFT,
   });
+
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [initialFormData, setInitialFormData] = useState<FormDataProps | null>(
+    null
+  );
+  const [isDirty, setIsDirty] = useState<boolean>(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
-  // On mount, set the uid in context if not provided.
   useEffect(() => {
-    // If a uid is provided via props, use it and set it in context
     if (propUid) {
       setUID(propUid);
-    } else {
-      // If no uid prop is given, check if we already have one in context
-      if (!currentFormUID) {
-        // If not, generate a new one and set it in context
-        const newUid = uuidv4();
-        setUID(newUid);
-      }
+    } else if (!currentFormUID) {
+      const newUid = uuidv4();
+      setUID(newUid);
     }
   }, [propUid, currentFormUID, setUID]);
 
-  // Once we have currentFormUID from context, load form data
   useEffect(() => {
     if (!currentFormUID) return;
 
     const savedFormData = localStorage.getItem(`formData_${currentFormUID}`);
     if (savedFormData) {
       const parsedData = JSON.parse(savedFormData) as FormDataProps;
-      console.log(parsedData);
       setFormData(parsedData);
       setQuestions(parsedData.question || []);
+      setInitialFormData(parsedData);
     } else {
       const newFormData: FormDataProps = {
         title: "Untitled Form",
@@ -77,8 +75,20 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
       };
       setFormData(newFormData);
       setQuestions([]);
+      setInitialFormData(newFormData);
     }
   }, [currentFormUID]);
+
+  const isFormDirty = (): boolean => {
+    if (!initialFormData) return false;
+
+    const currentForm = { ...formData, question: questions };
+    return JSON.stringify(initialFormData) !== JSON.stringify(currentForm);
+  };
+
+  useEffect(() => {
+    setIsDirty(isFormDirty());
+  }, [formData, questions, initialFormData]);
 
   const handleFormTitleUpdate = (newText: string) => {
     setFormData((prev) => ({ ...prev, title: newText }));
@@ -121,39 +131,30 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
     });
   };
 
-  // Validation function to check if the form has been updated
   const validateForm = (): boolean => {
-    // Check if the title is still the default
     if (formData.title.trim() === "Untitled Form") {
       toast.error("Please update the form title before saving.");
       return false;
     }
 
-    // Check if there are no questions
     if (questions.length === 0) {
       toast.error("Please add at least one question before saving.");
       return false;
     }
 
-    // Check if any question has the default title
-    const hasDefaultQuestionTitle = questions.some(
-      (q) => q.title.trim() === "Write a question"
-    );
-    if (hasDefaultQuestionTitle) {
+    if (questions.some((q) => q.title.trim() === "Write a question")) {
       toast.error("Please update all question titles before saving.");
       return false;
     }
 
-    // All validations passed
     return true;
   };
 
   const saveForm = (status: FormStatus) => {
     if (!currentFormUID) return;
 
-    // Perform validation before saving
     if (!validateForm()) {
-      return; // Stop the save operation if validation fails
+      return;
     }
 
     const cleanedQuestions = cleanupQuestions(formData.question);
@@ -164,7 +165,6 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
       uid: currentFormUID,
     };
 
-    // Update local storage
     const indexStr = localStorage.getItem(FORM_INDEX_KEY);
     const formUids: string[] = indexStr ? JSON.parse(indexStr) : [];
 
@@ -178,11 +178,11 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
       JSON.stringify(updatedFormData)
     );
 
-    // Update state and context
     setFormData(updatedFormData);
     setQuestions(cleanedQuestions);
-    setSavedForms(formUids); // Update context with the new saved forms list
-
+    setSavedForms(formUids);
+    setInitialFormData(updatedFormData); // Update initial form data
+    setIsDirty(false);
     generateToast(updatedFormData.status);
   };
 
@@ -200,9 +200,8 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
   const handlePreview = () => {
     if (!currentFormUID) return;
 
-    // Perform validation before previewing
     if (!validateForm()) {
-      return; // Stop the preview operation if validation fails
+      return;
     }
 
     const currentStatus = formData.status;
@@ -215,9 +214,8 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
   };
 
   const handlePublish = () => {
-    // Perform validation before publishing
     if (!validateForm()) {
-      return; // Stop the publish operation if validation fails
+      return;
     }
 
     saveForm(FormStatus.PUBLISHED);
@@ -236,12 +234,23 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
         </div>
 
         <button
-          className="text-gray-400 font-semibold border-gray-200"
+          className="text-gray-400 font-semibold border-gray-200 flex items-center gap-1"
           onClick={handlePreview}
         >
           Preview
           <TopRightArrow />
         </button>
+
+        {isDirty && (
+          <motion.div
+            initial={{ opacity: 0, filter: "blur(4px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: "blur(4px)" }}
+            className="absolute bottom-[-10px] text-xs px-2 bg-red-100 text-red-700 p-[1px] border-[1px] border-red-300 rounded-xl"
+          >
+            Unsaved changes, Save as draft or Publish
+          </motion.div>
+        )}
       </header>
       <main className="flex-grow overflow-auto p-6">
         {questions.length === 0 ? (

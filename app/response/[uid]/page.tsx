@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { FormDataProps } from "@/types/FormTypes";
+import { Trash2 } from "lucide-react";
 
 interface ResponseEntry {
   createdAt: number;
@@ -12,6 +13,7 @@ const Page = () => {
   const { uid } = useParams();
   const [formData, setFormData] = useState<FormDataProps | null>(null);
   const [responses, setResponses] = useState<ResponseEntry[]>([]);
+
   useEffect(() => {
     if (!uid) return;
     const savedFormData = localStorage.getItem(`formData_${uid}`);
@@ -28,27 +30,49 @@ const Page = () => {
     }
   }, [uid]);
 
+  // Handler to delete a response
+  const handleDelete = (createdAt: number) => {
+    if (confirm("Are you sure you want to delete this response?")) {
+      const updatedResponses = responses.filter(
+        (response) => response.createdAt !== createdAt
+      );
+      setResponses(updatedResponses);
+      localStorage.setItem(
+        `responses_${uid}`,
+        JSON.stringify(updatedResponses)
+      );
+    }
+  };
+
   if (!formData) {
     return (
-      <main className="w-screen h-screen flex items-center justify-center">
-        <p>Loading form data...</p>
+      <main className="w-full h-full">
+        <header className="sticky top-0 z-[2] bg-white border-b border-gray-200 h-[var(--top-bar-height)] flex items-center justify-between gap-2 p-6">
+          <div className="text-base font-semibold bg-gray-100 h-4 w-1/4"></div>
+        </header>
       </main>
     );
   }
 
-  // If there are no responses, show a message
   if (responses.length === 0) {
     return (
-      <main className="w-screen h-screen flex items-center justify-center">
-        <p>No responses found for this form.</p>
+      <main className="w-full h-full">
+        <header className="sticky top-0 z-[2] bg-white border-b border-gray-200 h-[var(--top-bar-height)] flex items-center justify-between gap-2 p-6">
+          <h1 className="text-base font-semibold">{formData.title}</h1>
+        </header>
+
+        <div className=""></div>
       </main>
     );
   }
 
   return (
-    <section className="p-6">
-      <h1 className="text-xl font-bold mb-4">{formData.title}</h1>
-      <div className="overflow-auto">
+    <section className="">
+      {/* <h1 className="text-xl font-bold mb-4">{formData.title}</h1> */}
+      <header className="sticky top-0 z-[2] bg-white border-b border-gray-200 h-[var(--top-bar-height)] flex items-center justify-between gap-2 p-6">
+        <h1 className="text-base font-semibold">{formData.title}</h1>
+      </header>
+      <div className="overflow-auto p-6">
         <table className="w-full border-collapse border border-gray-300 text-sm">
           <thead>
             <tr className="bg-gray-100">
@@ -59,11 +83,12 @@ const Page = () => {
                   {q.title}
                 </th>
               ))}
+              <th className="border border-gray-300 p-2"></th>
             </tr>
           </thead>
           <tbody>
-            {responses.map((res, idx) => (
-              <tr key={idx} className="hover:bg-gray-50">
+            {responses.map((res) => (
+              <tr key={res.createdAt} className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-2">
                   {new Date(res.createdAt).toLocaleString()}
                 </td>
@@ -72,6 +97,15 @@ const Page = () => {
                     {res.answers[q.id] || ""}
                   </td>
                 ))}
+                <td className="border border-gray-300 p-2 text-center">
+                  <button
+                    onClick={() => handleDelete(res.createdAt)}
+                    className="text-red-600 hover:text-red-800"
+                    title="Delete Response"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

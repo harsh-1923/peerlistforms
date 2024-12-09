@@ -58,7 +58,7 @@ const InlineEditableField = ({
           className="border-b-[1px] border-gray-300 focus:outline-none focus:border-blue-500 min-w-full"
         />
       ) : (
-        <h2 onClick={handleClick} className="cursor-text">
+        <h2 onClick={handleClick} className="cursor-text truncate">
           {text}
         </h2>
       )}

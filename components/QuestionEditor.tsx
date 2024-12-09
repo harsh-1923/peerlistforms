@@ -4,7 +4,8 @@ import ReorderHandle from "./icons/ReorderHandle";
 import InlineEditableField from "./InlineEditableHeader";
 import QuestionTypeChanger from "./QuestionTypeChanger";
 import SingleSelectOptionEditor from "./SingleSelectOptionEditor";
-import Trash from "./icons/Trash";
+import { DEFAULT_HELP_TEXT } from "./FormGeneratorRoot";
+import { Trash2 } from "lucide-react";
 
 interface QuestionEditorProps {
   question: Question;
@@ -85,7 +86,9 @@ const QuestionEditor = ({
       {/* Help Text  */}
       <InlineEditableField
         style="text-sm text-gray-400"
-        initialText={question.helpText}
+        initialText={
+          question.helpText === "" ? DEFAULT_HELP_TEXT : question.helpText
+        }
         onSave={handleHelpTextSave}
       />
 
@@ -118,8 +121,14 @@ const QuestionEditor = ({
             className="cursor-pointer"
           />
         </div>
-        <button onClick={handleDelete} className="hover:bg-red-100/40">
+        {/* <button onClick={handleDelete} className="hover:bg-red-100/40">
           <Trash />
+        </button> */}
+        <button
+          className="hover:bg-red-50 p-1 rounded-full"
+          onClick={handleDelete}
+        >
+          <Trash2 className="h-4 w-4 text-red-500 " />
         </button>
       </div>
     </Reorder.Item>
