@@ -11,6 +11,7 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        brand: "#00aa45",
       },
       keyframes: {
         slideDownAndFade: {

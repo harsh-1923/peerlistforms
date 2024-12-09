@@ -16,10 +16,9 @@ import Draft from "./icons/Draft";
 import Tick from "./icons/Tick";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Drawer } from "vaul";
-import FormList from "./FormList";
-import Menu from "./icons/Menu";
 import { useAppContext } from "@/context/AppContext";
+import { motion } from "motion/react";
+import IslandTrigger from "./IslandTrigger";
 
 const FORM_INDEX_KEY = "formIndex";
 const DEFAULT_HELP_TEXT =
@@ -65,10 +64,10 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
     const savedFormData = localStorage.getItem(`formData_${currentFormUID}`);
     if (savedFormData) {
       const parsedData = JSON.parse(savedFormData) as FormDataProps;
+      console.log(parsedData);
       setFormData(parsedData);
       setQuestions(parsedData.question || []);
     } else {
-      // If no data found for the given uid, create a new form with that uid
       const newFormData: FormDataProps = {
         title: "Untitled Form",
         question: [],
@@ -181,10 +180,10 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
   };
 
   return (
-    <div className="min-h-screen w-full relative">
-      <div className="px-6 py-4 flex items-center justify-between gap-4 border-b-[1px] border-gray-200 sticky top-0 bg-white z-[2]">
+    <div className="flex flex-col min-h-[100dvh]">
+      <header className="sticky top-0 z-[2] bg-white border-b border-gray-200 h-[var(--top-bar-height)] flex items-center justify-between gap-2 p-6">
         <div className="flex items-center gap-2 w-full">
-          <T />
+          <IslandTrigger />
           <InlineEditableField
             initialText={formData.title}
             onSave={handleFormTitleUpdate}
@@ -199,38 +198,35 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
           Preview
           <TopRightArrow />
         </button>
-      </div>
+      </header>
+      <main className="flex-grow overflow-auto p-6">
+        {questions.length === 0 ? (
+          <EmptyQuestionState />
+        ) : (
+          <Reorder.Group
+            as="div"
+            axis="y"
+            values={questions}
+            onReorder={setQuestions}
+            className="space-y-4"
+            layoutScroll
+          >
+            {questions.map((question) => (
+              <QuestionEditor
+                key={question.id}
+                question={question}
+                updateQuestion={updateQuestion}
+                removeQuestion={removeQuestion}
+              />
+            ))}
+          </Reorder.Group>
+        )}
 
-      <div
-        className="p-6 space-y-4 overflow-scroll"
-        style={{ minHeight: "calc(100dvh - 100px)" }}
-      >
-        <Reorder.Group
-          as="div"
-          axis="y"
-          values={questions}
-          onReorder={setQuestions}
-          className="space-y-4"
-          layoutScroll
-        >
-          {questions.map((question) => (
-            <QuestionEditor
-              key={question.id}
-              question={question}
-              updateQuestion={updateQuestion}
-              removeQuestion={removeQuestion}
-            />
-          ))}
-        </Reorder.Group>
-        <div
-          className="flex flex-col items-center gap-4 p-6 pb-[190px]"
-          ref={ref}
-        >
+        <div className="flex flex-col items-center gap-4 p-6" ref={ref}>
           <AddQuestionButton addQuestion={addQuestion} />
         </div>
-      </div>
-
-      <div className="w-full h-16 flex items-center justify-between gap-2 py-4 px-6 bg-gray-100 sticky bottom-0">
+      </main>
+      <footer className="sticky bottom-0 z-[2] bg-gray-100 border-t p-6 border-gray-200 h-[var(--bottom-bar-height)] flex items-center justify-between gap-2">
         <button
           onClick={() => saveForm(FormStatus.DRAFT)}
           className="bg-white text-sm font-medium gap-1"
@@ -245,37 +241,33 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
           <Tick />
           Publish form
         </button>
-      </div>
+      </footer>
     </div>
   );
 };
 
-const T = () => {
+const EmptyQuestionState = () => {
   return (
-    <div className="t">
-      <Drawer.Root direction="left">
-        <Drawer.Trigger className="" asChild>
-          <button className="p-0 rounded-sm text-gray-500">
-            <Menu />
-          </button>
-        </Drawer.Trigger>
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 bg-black/40 z-[5]" />
-          <Drawer.Content
-            className="left-2 top-2 bottom-2 fixed z-10 outline-none w-[310px] flex"
-            style={
-              {
-                "--initial-transform": "calc(100% + 8px)",
-              } as React.CSSProperties
-            }
-          >
-            <div className="bg-white h-full w-full grow p-4 flex flex-col rounded-[16px]">
-              <FormList />
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </div>
+    <motion.div
+      initial={{ y: 10, opacity: 0, filter: "blur(8px)" }}
+      animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+      exit={{ y: 10, opacity: 0, filter: "blur(8px)" }}
+      transition={{ duration: 0.3 }}
+      className="outline-gray-100 outline-[1px] outline w-full p-6 rounded-lg bg-white relative overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-100/80 z-[1px]"></div>
+      <div className="w-2/3 h-4 bg-gray-100 rounded-md mb-4"></div>
+      <div className="w-full h-10 bg-gray-100 rounded-md"></div>
+
+      <div className="absolute bottom-0 left-0 w-full p-2 text-center">
+        <p className="font-medium text-sm font-serif italic text-brand">
+          No questions added yet
+        </p>
+        <p className="font-medium text-xs font-serif italic text-gray-500">
+          Create a form and share with the world
+        </p>
+      </div>
+    </motion.div>
   );
 };
 

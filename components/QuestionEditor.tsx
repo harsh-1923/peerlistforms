@@ -55,7 +55,7 @@ const QuestionEditor = ({
       dragControls={dragControls}
       className="w-full border-[1px] border-gray-200 rounded-2xl p-4 space-y-2 bg-white"
       layout
-      transition={{ type: "spring", bounce: 0, duration: 0.2 }}
+      transition={{ type: "spring", bounce: 0, duration: 0.5 }}
       initial={{ y: 10, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: -10, opacity: 0 }}

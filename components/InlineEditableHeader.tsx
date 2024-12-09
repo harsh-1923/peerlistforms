@@ -22,6 +22,10 @@ const InlineEditableField = ({
     }
   }, [isEditing]);
 
+  useEffect(() => {
+    setText(initialText);
+  }, [initialText]);
+
   const handleClick = () => {
     setIsEditing(true);
   };

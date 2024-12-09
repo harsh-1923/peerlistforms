@@ -16,10 +16,13 @@
   --sh-jsxliterals: #7aa2f7;
   --sh-property: #73daca;
   --sh-entity: #e0af68;
+
+  --brand: #00aa45;
+  overscroll-behavior: none;
 }
 
-input:focus {
-  outline: 2px solid #00aa45;
+:focus {
+  outline: 1px solid #00aa45;
 }
 
 body {
