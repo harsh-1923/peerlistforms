@@ -3,6 +3,7 @@ import { FormDataProps } from "@/types/FormTypes";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import FormNotFound from "./FormNotFound";
+import { useAppContext } from "@/context/AppContext";
 
 interface ExtendedFormDataProps extends FormDataProps {
   responseCount: number;
@@ -10,15 +11,16 @@ interface ExtendedFormDataProps extends FormDataProps {
 
 const FormList = () => {
   const [forms, setForms] = useState<ExtendedFormDataProps[]>([]);
+  const { savedForms } = useAppContext();
 
   useEffect(() => {
-    const indexStr = localStorage.getItem("formIndex");
-    if (!indexStr) return;
-
-    const uids = JSON.parse(indexStr) as string[];
+    if (savedForms.length === 0) {
+      setForms([]);
+      return;
+    }
 
     const loadedForms: ExtendedFormDataProps[] = [];
-    for (const uid of uids) {
+    for (const uid of savedForms) {
       const formDataStr = localStorage.getItem(`formData_${uid}`);
       if (formDataStr) {
         const formData = JSON.parse(formDataStr) as FormDataProps;
@@ -31,7 +33,7 @@ const FormList = () => {
     }
 
     setForms(loadedForms);
-  }, []);
+  }, [savedForms]);
 
   return (
     <div>
@@ -41,7 +43,7 @@ const FormList = () => {
       ) : (
         <ul className="space-y-2">
           {forms.map((f) => (
-            <FormItem form={f} key={f.uid}></FormItem>
+            <FormItem form={f} key={f.uid} />
           ))}
         </ul>
       )}

@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { Drawer } from "vaul";
 import FormList from "./FormList";
 import Menu from "./icons/Menu";
+import { useAppContext } from "@/context/AppContext";
 
 const FORM_INDEX_KEY = "formIndex";
 const DEFAULT_HELP_TEXT =
@@ -28,51 +29,57 @@ interface FormGeneratorRootProps {
   uid?: string;
 }
 
-const FormGeneratorRoot = ({ uid }: FormGeneratorRootProps) => {
+const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
   const router = useRouter();
+  const { currentFormUID, setUID, setSavedForms } = useAppContext();
+
   const [formData, setFormData] = useState<FormDataProps>({
     title: "Untitled Form",
     question: [],
-    uid: uuidv4(),
+    uid: "",
     createdAt: Date.now().toString(),
     status: FormStatus.DRAFT,
   });
   const [questions, setQuestions] = useState<Question[]>([]);
   const ref = useRef<HTMLDivElement | null>(null);
 
+  // On mount, set the uid in context if not provided.
   useEffect(() => {
-    if (uid) {
-      // If a uid is provided, try to load the form data from local storage
-      const savedFormData = localStorage.getItem(`formData_${uid}`);
-      if (savedFormData) {
-        const parsedData = JSON.parse(savedFormData) as FormDataProps;
-        setFormData(parsedData);
-        setQuestions(parsedData.question || []);
-      } else {
-        // If no data found for the given uid, create a new form with that uid
-        const newFormData: FormDataProps = {
-          title: "Untitled Form",
-          question: [],
-          uid,
-          createdAt: Date.now().toString(),
-          status: FormStatus.DRAFT,
-        };
-        setFormData(newFormData);
-        setQuestions([]);
-      }
+    // If a uid is provided via props, use it and set it in context
+    if (propUid) {
+      setUID(propUid);
     } else {
-      const newUid = uuidv4();
+      // If no uid prop is given, check if we already have one in context
+      if (!currentFormUID) {
+        // If not, generate a new one and set it in context
+        const newUid = uuidv4();
+        setUID(newUid);
+      }
+    }
+  }, [propUid, currentFormUID, setUID]);
+
+  // Once we have currentFormUID from context, load form data
+  useEffect(() => {
+    if (!currentFormUID) return;
+
+    const savedFormData = localStorage.getItem(`formData_${currentFormUID}`);
+    if (savedFormData) {
+      const parsedData = JSON.parse(savedFormData) as FormDataProps;
+      setFormData(parsedData);
+      setQuestions(parsedData.question || []);
+    } else {
+      // If no data found for the given uid, create a new form with that uid
       const newFormData: FormDataProps = {
         title: "Untitled Form",
         question: [],
-        uid: newUid,
+        uid: currentFormUID,
         createdAt: Date.now().toString(),
         status: FormStatus.DRAFT,
       };
       setFormData(newFormData);
       setQuestions([]);
     }
-  }, [uid]);
+  }, [currentFormUID]);
 
   const handleFormTitleUpdate = (newText: string) => {
     setFormData((prev) => ({ ...prev, title: newText }));
@@ -116,21 +123,34 @@ const FormGeneratorRoot = ({ uid }: FormGeneratorRootProps) => {
   };
 
   const saveForm = (status: FormStatus) => {
+    if (!currentFormUID) return;
     const cleanedQuestions = cleanupQuestions(formData.question);
-    const updatedFormData = { ...formData, question: cleanedQuestions, status };
-    const { uid } = updatedFormData;
+    const updatedFormData = {
+      ...formData,
+      question: cleanedQuestions,
+      status,
+      uid: currentFormUID,
+    };
 
+    // Update local storage
     const indexStr = localStorage.getItem(FORM_INDEX_KEY);
     const formUids: string[] = indexStr ? JSON.parse(indexStr) : [];
 
-    if (!formUids.includes(uid)) {
-      formUids.push(uid);
+    if (!formUids.includes(currentFormUID)) {
+      formUids.push(currentFormUID);
     }
 
     localStorage.setItem(FORM_INDEX_KEY, JSON.stringify(formUids));
-    localStorage.setItem(`formData_${uid}`, JSON.stringify(updatedFormData));
+    localStorage.setItem(
+      `formData_${currentFormUID}`,
+      JSON.stringify(updatedFormData)
+    );
+
+    // Update state and context
     setFormData(updatedFormData);
     setQuestions(cleanedQuestions);
+    setSavedForms(formUids); // Update context with the new saved forms list
+
     generateToast(updatedFormData.status);
   };
 
@@ -146,13 +166,14 @@ const FormGeneratorRoot = ({ uid }: FormGeneratorRootProps) => {
   };
 
   const handlePreview = () => {
+    if (!currentFormUID) return;
     const currentStatus = formData.status;
     const statusToSave =
       currentStatus === FormStatus.PUBLISHED
         ? FormStatus.PUBLISHED
         : FormStatus.DRAFT;
     saveForm(statusToSave);
-    router.push(`/preview/${formData.uid}`);
+    router.push(`/preview/${currentFormUID}`);
   };
 
   const handlePublish = () => {

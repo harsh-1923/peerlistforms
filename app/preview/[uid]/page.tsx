@@ -69,30 +69,54 @@ const PreviewPage = () => {
   const progress = totalQuestions > 0 ? answeredCount / totalQuestions : 0;
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center">
-      <div className="max-w-[800px] w-full border-[1px] border-gray-200 bg-white flex-1 overflow-auto">
-        <div className="flex items-start justify-between gap-2 mb-6 p-6">
-          <h2 className="text-base font-semibold">{formData.title}</h2>
-          <FormCompletenessStatus progress={progress} />
-        </div>
-        <div className="p-6 space-y-8">
-          {formData.question.map((q) => (
-            <QuestionViewer
-              key={q.id}
-              question={q}
-              value={answers[q.id] ?? ""}
-              onChange={(val) => handleInputChange(q.id, val)}
-            />
-          ))}
-        </div>
-        <div className="w-full flex justify-end gap-2 p-4">
-          <button
-            onClick={handleSubmit}
-            className="bg-[#00AA45] text-white text-sm font-semibold gap-1 shadow-sm px-4"
-          >
-            Submit
-          </button>
-        </div>
+    // <div className="w-screen h-screen flex flex-col items-center">
+    //   <div className="max-w-[800px] w-full border-[1px] border-gray-200 bg-white flex-1 overflow-auto">
+    // <div className="flex items-start justify-between gap-2 mb-6 p-6">
+    //   <h2 className="text-base font-semibold">{formData.title}</h2>
+    //   <FormCompletenessStatus progress={progress} />
+    // </div>
+    // <div className="p-6 space-y-8">
+    //   {formData.question.map((q) => (
+    //     <QuestionViewer
+    //       key={q.id}
+    //       question={q}
+    //       value={answers[q.id] ?? ""}
+    //       onChange={(val) => handleInputChange(q.id, val)}
+    //     />
+    //   ))}
+    // </div>
+    // <div className="w-full flex justify-end gap-2 p-4">
+    //   <button
+    //     onClick={handleSubmit}
+    //     className="bg-[#00AA45] text-white text-sm font-semibold gap-1 shadow-sm px-4"
+    //   >
+    //     Submit
+    //   </button>
+    // </div>
+    //   </div>
+    // </div>
+    <div>
+      <div className="flex items-start justify-between gap-2 mb-6 p-6 border-b-[1px] border-gray-200">
+        <h2 className="text-base font-semibold">{formData.title}</h2>
+        <FormCompletenessStatus progress={progress} />
+      </div>
+      <div className="p-6 space-y-8">
+        {formData.question.map((q) => (
+          <QuestionViewer
+            key={q.id}
+            question={q}
+            value={answers[q.id] ?? ""}
+            onChange={(val) => handleInputChange(q.id, val)}
+          />
+        ))}
+      </div>
+      <div className="w-full flex justify-end gap-2 p-4">
+        <button
+          onClick={handleSubmit}
+          className="bg-[#00AA45] text-white text-sm font-semibold gap-1 shadow-sm px-4"
+        >
+          Submit
+        </button>
       </div>
     </div>
   );
@@ -186,7 +210,7 @@ const FormCompletenessStatus = ({ progress }: { progress: number }) => {
       <p className="text-sm text-right">
         Form completeness — {Math.round(progress * 100)}%
       </p>
-      <div className="relative w-[200px] h-2 rounded-xl bg-red-100 overflow-clip">
+      <div className="relative w-[200px] h-2 rounded-xl bg-gray-100 overflow-clip">
         <div
           className="absolute inset-0 bg-[#00af45] progress-bar"
           style={{ width: `${progress * 100}%` }}
