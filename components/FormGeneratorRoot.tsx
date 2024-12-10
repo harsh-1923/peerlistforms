@@ -91,6 +91,7 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
   }, [formData, questions, initialFormData]);
 
   const handleFormTitleUpdate = (newText: string) => {
+    //delete
     setFormData((prev) => ({ ...prev, title: newText }));
   };
 
