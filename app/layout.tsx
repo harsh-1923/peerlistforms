@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-// import { Instrument_Serif } from "next/font/google"; // Adjust based on actual font name
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { Toaster } from "sonner";
 import FormList from "@/components/FormList";
@@ -61,6 +61,7 @@ export default function RootLayout({
               <FormList />
             </aside>
             <Toaster />
+            <Analytics />
           </main>
         </AppContextProvider>
       </body>
