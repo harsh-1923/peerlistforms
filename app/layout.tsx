@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Instrument_Serif } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -19,6 +20,13 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+  variable: "--font-instrument-serif",
+});
+
 export const metadata: Metadata = {
   title: "Peerlist Forms - Build forms for the world",
   description: "Generate beautiful forms",
@@ -32,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased`}
         style={
           {
             "--top-bar-height": "60px",

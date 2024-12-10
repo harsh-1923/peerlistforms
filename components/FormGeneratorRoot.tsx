@@ -88,7 +88,7 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
 
   useEffect(() => {
     setIsDirty(isFormDirty());
-  }, [formData, questions, initialFormData]);
+  }, [formData, questions, initialFormData, isFormDirty]);
 
   const handleFormTitleUpdate = (newText: string) => {
     setFormData((prev) => ({ ...prev, title: newText }));
@@ -302,24 +302,39 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
 const EmptyQuestionState = () => {
   return (
     <motion.div
-      initial={{ y: 10, opacity: 0, filter: "blur(8px)" }}
-      animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-      exit={{ y: 10, opacity: 0, filter: "blur(8px)" }}
-      transition={{ duration: 0.3 }}
-      className="outline-gray-100 outline-[1px] outline w-full p-6 rounded-lg bg-white relative overflow-hidden"
+      initial={{ y: 10, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 10, opacity: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="outline-gray-200 outline-[1px] outline w-full p-6 rounded-lg bg-white relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-100/80 z-[1px]"></div>
-      <div className="w-2/3 h-4 bg-gray-100 rounded-md mb-4"></div>
-      <div className="w-full h-10 bg-gray-100 rounded-md"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-100/80 z-[1]"></div>
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="w-2/3 h-4 bg-gray-100 rounded-md mb-5 origin-left"
+      ></motion.div>
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+        className="w-full h-10 bg-gray-100 rounded-md origin-left"
+      ></motion.div>
 
-      <div className="absolute bottom-0 left-0 w-full p-2 text-center">
-        <p className="font-medium text-sm font-serif italic text-brand">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+        className="absolute bottom-0 left-0 w-full p-3 text-center"
+      >
+        <p className={`font-medium text-sm text-brand mb-1`}>
           No questions added yet
         </p>
-        <p className="font-medium text-xs font-serif italic text-gray-500">
+        <p className={`font-medium text-xs text-gray-500`}>
           Create a form and share with the world
         </p>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

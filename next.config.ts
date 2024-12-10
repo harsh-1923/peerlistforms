@@ -7,16 +7,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "www.example.com",
-        port: "", // Leave empty if not using a specific port
-        pathname: "/api/image/**",
+        hostname: "www.peerlistforms.vercel.app",
+        port: "",
+        pathname: "/",
       },
     ],
   },
 };
 
-const withMDX = createMDX({
-  // Add markdown plugins here, as desired
-});
+const withMDX = createMDX({});
 
 export default withMDX(nextConfig);

@@ -21,9 +21,15 @@
   overscroll-behavior: none;
 }
 
-/* :focus {
-  outline: 1px solid #00aa45;
-} */
+::selection {
+  background-color: var(--brand);
+  color: white;
+}
+
+::-moz-selection {
+  background-color: var(--brand);
+  color: white;
+}
 
 :focus-visible {
   outline: 1px solid var(--brand);
@@ -50,6 +56,13 @@ textarea:hover {
     color-mix(in srgb, var(--color), transparent 70%) 96%,
     color-mix(in srgb, var(--color), transparent 30%)
   );
+}
+
+.mark-yellow {
+  --color: yellow;
+}
+.mark-pink {
+  --color: rgb(255, 122, 144);
 }
 
 body {
