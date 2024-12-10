@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { FormDataProps } from "@/types/FormTypes";
-import { Trash2, FileSpreadsheet } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import NoResponsesState from "@/components/NoResponsesState";
 
 interface ResponseEntry {

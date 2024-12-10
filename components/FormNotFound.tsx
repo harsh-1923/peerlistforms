@@ -48,11 +48,11 @@ const FormNotFound = () => {
           className="flex flex-col items-center justify-end"
         >
           <ClipboardList className="w-12 h-12 text-gray-300 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-800 mb-2 italic font-instrumentserif">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2 ">
             No Forms Found
           </h3>
           <p className="text-sm text-gray-500 mb-4">
-            It looks like you haven't created any forms yet.
+            It looks like you havent created any forms yet.
           </p>
         </motion.div>
       </div>

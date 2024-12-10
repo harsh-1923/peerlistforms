@@ -88,7 +88,7 @@ const FormGeneratorRoot = ({ uid: propUid }: FormGeneratorRootProps) => {
 
   useEffect(() => {
     setIsDirty(isFormDirty());
-  }, [formData, questions, initialFormData, isFormDirty]);
+  }, [formData, questions, initialFormData]);
 
   const handleFormTitleUpdate = (newText: string) => {
     setFormData((prev) => ({ ...prev, title: newText }));
