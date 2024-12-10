@@ -8,6 +8,7 @@ import FormList from "@/components/FormList";
 import { AppContextProvider } from "@/context/AppContext";
 import Image from "next/image";
 import Link from "next/link";
+import Peerlist from "@/components/icons/Peerlist";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -51,8 +52,9 @@ export default function RootLayout({
         <AppContextProvider>
           <main className="w-screen min-h-[100dvh] flex items-stretch">
             <aside className="h-full p-4 flex-[1] max-w-[300px] overflow-y-auto pannel">
-              <Link href="/" className="flex items-start gap-2">
-                <Image src="/LOGO.png" width="30" height="30" alt="Logo" />
+              <Link href="/" className="flex items-center gap-2">
+                {/* <Image src="/LOGO.png" width="30" height="30" alt="Logo" /> */}
+                <Peerlist />
 
                 <div className="text-black text-2xl font-serif">Peerlist</div>
               </Link>
