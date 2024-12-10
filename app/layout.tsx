@@ -6,7 +6,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import FormList from "@/components/FormList";
 import { AppContextProvider } from "@/context/AppContext";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import Peerlist from "@/components/icons/Peerlist";
 
