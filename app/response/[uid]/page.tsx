@@ -23,8 +23,6 @@ const Page = () => {
       const parsedFormData = JSON.parse(savedFormData) as FormDataProps;
       setFormData(parsedFormData);
     }
-
-    // Load responses
     const savedResponses = localStorage.getItem(`responses_${uid}`);
     if (savedResponses) {
       const parsedResponses = JSON.parse(savedResponses) as ResponseEntry[];
