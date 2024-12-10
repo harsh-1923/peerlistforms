@@ -44,12 +44,7 @@ export default function RootLayout({
           <main className="w-screen min-h-[100dvh] flex items-stretch">
             <aside className="h-full p-4 flex-[1] max-w-[300px] overflow-y-auto pannel">
               <Link href="/" className="flex items-start gap-2">
-                <Image
-                  src="/images/LOGO.png"
-                  width="30"
-                  height="30"
-                  alt="Logo"
-                />
+                <Image src="/LOGO.png" width="30" height="30" alt="Logo" />
 
                 <div className="text-black text-2xl font-serif">Peerlist</div>
               </Link>
